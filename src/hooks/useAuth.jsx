@@ -2,6 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext()
 
+// Get backend URL from environment variable
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
+
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
@@ -42,7 +45,7 @@ export const AuthProvider = ({ children }) => {
       formData.append('username', credentials.username)
       formData.append('password', credentials.password)
 
-      const response = await fetch('http://localhost:8000/token', {
+      const response = await fetch(`${API_BASE_URL}/token`, {
         method: 'POST',
         body: formData,
       })
@@ -55,7 +58,7 @@ export const AuthProvider = ({ children }) => {
       const tokenData = await response.json()
       
       // Get user details with the token
-      const userResponse = await fetch('http://localhost:8000/api/user/me', {
+      const userResponse = await fetch(`${API_BASE_URL}/api/user/me`, {
         headers: {
           'Authorization': `Bearer ${tokenData.access_token}`
         }
