@@ -4,6 +4,11 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Auto-detect API URL based on environment
+const API_BASE_URL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:8000'
+  : 'https://backend-v3iv.onrender.com';
+
 // Custom railway station icon (simplified)
 const stationIcon = new Icon({
   iconUrl: 'data:image/svg+xml;base64,' + btoa(`
@@ -49,7 +54,7 @@ const SectionMap = ({ sectionId, wsData }) => {
   const fetchSectionMapData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8000/api/section_map/${sectionId}/geo`, {
+      const response = await fetch(`${API_BASE_URL}/api/section_map/${sectionId}/geo`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
