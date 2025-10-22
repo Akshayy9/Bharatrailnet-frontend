@@ -4,6 +4,14 @@ import useTheme from '../hooks/useTheme';
 import Chart from 'chart.js/auto';
 import SectionMap from './SectionMap';  // Add this import
 
+// Auto-detect API URL based on environment
+const API_BASE_URL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:8000'
+  : 'https://backend-v3iv.onrender.com';
+
+const WS_BASE_URL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'ws://localhost:8000'
+  : 'wss://backend-v3iv.onrender.com';
 
 // --- Reusable Chart Component ---
 const ReportChart = ({ chartConfig, theme }) => {
@@ -56,10 +64,8 @@ useEffect(() => {
   };
 }, [chartConfig, theme]);
 
-
     return <canvas ref={chartRef}></canvas>;
 };
-
 
 // --- LiveSectionMap Component ---
 // This component now receives all its data via props, making it much cleaner.
@@ -146,9 +152,9 @@ const Dashboard = ({ onLogout }) => {
         const headers = { 'Authorization': `Bearer ${authToken}` };
         // Fetch all initial data together
         const [kpisRes, trainsRes, mapRes] = await Promise.all([
-          fetch('http://localhost:8000/api/dashboard/kpis', { headers }),
-          fetch('http://localhost:8000/api/dashboard/trains', { headers }),
-          fetch(`http://localhost:8000/api/section_map/${sectionId}`, { headers })
+          fetch(`${API_BASE_URL}/api/dashboard/kpis`, { headers }),
+          fetch(`${API_BASE_URL}/api/dashboard/trains`, { headers }),
+          fetch(`${API_BASE_URL}/api/section_map/${sectionId}`, { headers })
         ]);
         
         if (!kpisRes.ok || !trainsRes.ok || !mapRes.ok) {
@@ -189,7 +195,7 @@ useEffect(() => {
       setConnectionStatus('Connecting');
       
       // Include auth token in WebSocket URL as query parameter
-      const wsUrl = `ws://localhost:8000/ws/${sectionId}?token=${authToken}`;
+      const wsUrl = `${WS_BASE_URL}/ws/${sectionId}?token=${authToken}`;
       console.log('WebSocket URL:', wsUrl.replace(authToken, 'TOKEN_HIDDEN'));
       
       ws = new WebSocket(wsUrl);
@@ -288,7 +294,7 @@ useEffect(() => {
     if (activeView === 'audit' && authToken) {
       const fetchAuditLogs = async () => {
         try {
-          const response = await fetch('http://localhost:8000/api/audit_trail', { headers: { 'Authorization': `Bearer ${authToken}` }});
+          const response = await fetch(`${API_BASE_URL}/api/audit_trail`, { headers: { 'Authorization': `Bearer ${authToken}` }});
           if (!response.ok) throw new Error('Failed to fetch audit logs');
           setAuditLogs(await response.json());
         } catch (error) { console.error("Failed to fetch audit logs:", error); }
@@ -430,9 +436,6 @@ useEffect(() => {
                     </div>
                 </div>
                 
-    
-                
-                
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Live Train Status & AI Recommendations</h3>
                     <div className="overflow-y-auto h-96">
@@ -479,7 +482,6 @@ useEffect(() => {
     />
   </div>
 )}
-
 
             {activeView === 'simulation' && 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
