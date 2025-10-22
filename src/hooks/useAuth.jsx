@@ -45,14 +45,18 @@ export const AuthProvider = ({ children }) => {
       formData.append('username', credentials.username)
       formData.append('password', credentials.password)
 
+      console.log('Attempting login to:', `${API_BASE_URL}/token`)
+
       const response = await fetch(`${API_BASE_URL}/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: formData,
-        credentials: 'include', // FIXED: Added for CORS
+        // Removed credentials: 'include' when using wildcard CORS
       })
+
+      console.log('Login response status:', response.status)
 
       if (!response.ok) {
         const error = await response.json()
@@ -63,13 +67,13 @@ export const AuthProvider = ({ children }) => {
       }
 
       const tokenData = await response.json()
+      console.log('Token received successfully')
 
       // Get user details with the token
       const userResponse = await fetch(`${API_BASE_URL}/api/user/me`, {
         headers: {
           'Authorization': `Bearer ${tokenData.access_token}`
         },
-        credentials: 'include', // FIXED: Added for CORS
       })
 
       if (!userResponse.ok) {
@@ -80,6 +84,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const userData = await userResponse.json()
+      console.log('User data received:', userData)
 
       setUser(userData)
       setAuthToken(tokenData.access_token)
@@ -95,7 +100,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Login error:', error)
       return {
         success: false,
-        error: 'Network error. Please check if the backend is running.'
+        error: 'Network error: ' + error.message
       }
     }
   }
