@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import useTheme from '../hooks/useTheme';
 import Chart from 'chart.js/auto';
+import SectionMap from './SectionMap';  // Add this import
 
 // Auto-detect API URL based on environment
 const API_BASE_URL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -16,51 +17,55 @@ const WS_BASE_URL = typeof window !== 'undefined' && (window.location.hostname =
 const ReportChart = ({ chartConfig, theme }) => {
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
+const firstRender = useRef(true);
 
-    useEffect(() => {
+useEffect(() => {
+  if (chartRef.current) {
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+    }
+    const ctx = chartRef.current.getContext('2d');
 
-        if (chartRef.current) {
-            if (chartInstance.current) {
-                chartInstance.current.destroy();
-            }
-            const ctx = chartRef.current.getContext('2d');
-            chartInstance.current = new Chart(ctx, {
-                ...chartConfig,
-                options: {
-                    ...chartConfig.options,
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { color: theme === 'dark' ? '#374151' : '#e5e7eb' },
-                            ticks: { color: theme === 'dark' ? '#9ca3af' : '#6b7280' }
-                        },
-                        x: { 
-                            grid: { color: theme === 'dark' ? '#374151' : '#e5e7eb' },
-                            ticks: { color: theme === 'dark' ? '#9ca3af' : '#6b7280' }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: theme === 'dark' ? '#d1d5db' : '#374151'
-                            }
-                        }
-                    }
-                }
-            });
+    // Deep clone to safely modify chartConfig options
+    const config = JSON.parse(JSON.stringify(chartConfig));
+    config.options = {
+      ...config.options,
+      animation: firstRender.current ? { duration: 1000 } : false,
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { 
+          beginAtZero: true, 
+          grid: { color: theme === 'dark' ? '#374151' : '#e5e7eb' },
+          ticks: { color: theme === 'dark' ? '#9ca3af' : '#6b7280' }
+        },
+        x: { 
+          grid: { color: theme === 'dark' ? '#374151' : '#e5e7eb' },
+          ticks: { color: theme === 'dark' ? '#9ca3af' : '#6b7280' }
         }
-        return () => {
-            if (chartInstance.current) {
-                chartInstance.current.destroy();
-            }
-        };
-    }, [chartConfig, theme]);
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: theme === 'dark' ? '#d1d5db' : '#374151'
+          }
+        }
+      }
+    };
+
+    chartInstance.current = new Chart(ctx, config);
+    firstRender.current = false;
+  }
+
+  return () => {
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+    }
+  };
+}, [chartConfig, theme]);
 
     return <canvas ref={chartRef}></canvas>;
 };
-
 
 // --- LiveSectionMap Component ---
 // This component now receives all its data via props, making it much cleaner.
@@ -468,7 +473,16 @@ useEffect(() => {
                 </div>
               </div>
             )}
-            {activeView === 'live-map' && <LiveSectionMap tracks={tracks} stations={stations} liveTrains={liveTrains} />}
+            {activeView === 'live-map' && (
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md h-full">
+    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">🚂 Live Railway Section Map - {user?.sectionName || 'Ghaziabad (GZB)'}</h3>
+    <SectionMap 
+      sectionId={user?.section || 'GZB'} 
+      wsData={{}} 
+    />
+  </div>
+)}
+
             {activeView === 'simulation' && 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
