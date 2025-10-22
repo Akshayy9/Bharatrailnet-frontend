@@ -2,9 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext()
 
-// Get backend URL from environment variable
-const API_BASE_URL = 'https://backend-v3iv.onrender.com'
-
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
@@ -23,7 +20,7 @@ export const AuthProvider = ({ children }) => {
     // Check if user is logged in (check sessionStorage)
     const savedUser = sessionStorage.getItem('trainAppUser')
     const savedToken = sessionStorage.getItem('trainAppToken')
-
+    
     if (savedUser && savedToken) {
       try {
         const userData = JSON.parse(savedUser)
@@ -40,68 +37,48 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      // FIXED: Use URLSearchParams instead of FormData for OAuth2PasswordRequestForm
-      const formData = new URLSearchParams()
+      // Call your actual backend API
+      const formData = new FormData()
       formData.append('username', credentials.username)
       formData.append('password', credentials.password)
 
-      console.log('Attempting login to:', `${API_BASE_URL}/token`)
-
-      const response = await fetch(`${API_BASE_URL}/token`, {
+      const response = await fetch('http://localhost:8000/token', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
         body: formData,
-        // Removed credentials: 'include' when using wildcard CORS
       })
-
-      console.log('Login response status:', response.status)
 
       if (!response.ok) {
         const error = await response.json()
-        return {
-          success: false,
-          error: error.detail || 'Login failed'
-        }
+        return { success: false, error: error.detail || 'Login failed' }
       }
 
       const tokenData = await response.json()
-      console.log('Token received successfully')
-
+      
       // Get user details with the token
-      const userResponse = await fetch(`${API_BASE_URL}/api/user/me`, {
+      const userResponse = await fetch('http://localhost:8000/api/user/me', {
         headers: {
           'Authorization': `Bearer ${tokenData.access_token}`
-        },
+        }
       })
 
       if (!userResponse.ok) {
-        return {
-          success: false,
-          error: 'Failed to get user details'
-        }
+        return { success: false, error: 'Failed to get user details' }
       }
 
       const userData = await userResponse.json()
-      console.log('User data received:', userData)
-
+      
       setUser(userData)
       setAuthToken(tokenData.access_token)
       setIsAuthenticated(true)
-
+      
       // Save to sessionStorage
       sessionStorage.setItem('trainAppUser', JSON.stringify(userData))
       sessionStorage.setItem('trainAppToken', tokenData.access_token)
-
+      
       return { success: true }
-
     } catch (error) {
       console.error('Login error:', error)
-      return {
-        success: false,
-        error: 'Network error: ' + error.message
-      }
+      return { success: false, error: 'Network error. Please check if the backend is running.' }
     }
   }
 
@@ -115,8 +92,11 @@ export const AuthProvider = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <div className="flex items-center space-x-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="text-gray-600 dark:text-gray-300">Loading...</span>
+        </div>
       </div>
     )
   }
@@ -125,7 +105,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       isAuthenticated,
       user,
-      authToken,
+      authToken,  // Now providing authToken
       login,
       logout
     }}>
