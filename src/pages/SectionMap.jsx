@@ -36,41 +36,35 @@ const SectionMap = ({ sectionId, wsData }) => {
   }, [sectionId]);
 
   const fetchSectionMapData = async () => {
-    try {
-      setLoading(true);
-      // FIX: Try both "brn_token" and "token" for compatibility
-      const storedToken =
-        localStorage.getItem('brn_token') ||
-        localStorage.getItem('token');
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/section_map/${sectionId}/geo`,
-        {
-          headers: {
-            Authorization: `Bearer ${storedToken}`
-          }
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setMapData(data);
-        // Set map center and zoom to focus on railway section if stations exist
-        if (data.stations.length > 0) {
-          const lats = data.stations.map((s) => s.latitude);
-          const lngs = data.stations.map((s) => s.longitude);
-          const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
-          const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
-          setCenter([centerLat, centerLng]);
-        }
-      } else {
-        console.error('Failed to fetch map data:', response.status);
+  try {
+    setLoading(true);
+    const storedToken = localStorage.getItem('brn_token') || localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/api/section_map/${sectionId}/geo`, {
+      headers: { Authorization: `Bearer ${storedToken}` }
+    });
+    console.log("Geo fetch status:", response.status);
+    const text = await response.text();
+    console.log("Geo fetch raw text:", text);
+    if (response.ok) {
+      const data = JSON.parse(text);
+      setMapData(data);
+      if (data.stations.length > 0) {
+        const lats = data.stations.map((s) => s.latitude);
+        const lngs = data.stations.map((s) => s.longitude);
+        const centerLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+        const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+        setCenter([centerLat, centerLng]);
       }
-    } catch (error) {
-      console.error('Failed to fetch section map data:', error);
-    } finally {
-      setLoading(false);
+    } else {
+      console.error('Failed to fetch map data:', response.status, text);
     }
-  };
+  } catch (error) {
+    console.error('Failed to fetch section map data:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (loading) {
     return (
