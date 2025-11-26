@@ -1,120 +1,224 @@
-// Mock API service for demo purposes
+// api.js - Production API service for BharatRailNet
+
 class ApiService {
   constructor() {
-    this.baseURL = 'http://localhost:8000'
+    // Production backend URL
+    this.baseURL = 'http://localhost:8000';
+    this.token = null;
   }
 
-  // Simulate API delay
-  async mockDelay(ms = 500) {
-    return new Promise(resolve => setTimeout(resolve, ms))
+  /**
+   * Set authentication token
+   */
+  setToken(token) {
+    this.token = token;
+    if (token) {
+      localStorage.setItem('brn_token', token);
+    } else {
+      localStorage.removeItem('brn_token');
+    }
   }
 
-  async login(credentials) {
-    await this.mockDelay()
+  /**
+   * Get stored token
+   */
+  getToken() {
+    if (!this.token) {
+      this.token = localStorage.getItem('brn_token');
+    }
+    return this.token;
+  }
+
+  /**
+   * Get authorization headers
+   */
+  getAuthHeaders() {
+    const token = this.getToken();
+    return {
+      'Authorization': token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  /**
+   * Handle API errors
+   */
+  async handleResponse(response) {
+    if (!response.ok) {
+      const text = await response.text();
+      let errorMessage = `HTTP ${response.status}`;
+      
+      try {
+        const data = JSON.parse(text);
+        errorMessage = data.detail || data.message || errorMessage;
+      } catch {
+        errorMessage = text || errorMessage;
+      }
+      
+      throw new Error(errorMessage);
+    }
     
-    // Demo credentials
-    if (credentials.username === 'SK001' && credentials.password === 'demo123') {
+    return response.json();
+  }
+
+  /**
+   * Login with OAuth2 form-encoded credentials
+   */
+  async login(credentials) {
+    try {
+      // OAuth2PasswordRequestForm expects form-encoded data
+      const body = new URLSearchParams({
+        username: credentials.username,
+        password: credentials.password,
+        // Note: section is not part of standard OAuth2; backend ignores extra fields
+      });
+
+      const response = await fetch(`${this.baseURL}/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: body.toString(),
+      });
+
+      const data = await this.handleResponse(response);
+      
+      // Store token
+      this.setToken(data.access_token);
+      
+      // Fetch user details
+      const user = await this.getCurrentUser();
+      
       return {
         success: true,
-        access_token: 'demo-token-' + Date.now(),
+        access_token: data.access_token,
         user: {
-          name: 'Demo Controller',
-          section: credentials.section,
-          employeeId: credentials.username
-        }
-      }
+          name: user.name,
+          section: user.section,
+          sectionName: user.sectionName,
+          employeeId: user.id,
+        },
+      };
+    } catch (error) {
+      console.error('Login error:', error);
+      return {
+        success: false,
+        error: error.message || 'Login failed',
+      };
     }
-    
-    throw new Error('Invalid credentials. Use SK001/demo123')
   }
 
+  /**
+   * Logout
+   */
+  logout() {
+    this.setToken(null);
+  }
+
+  /**
+   * Get current authenticated user
+   */
+  async getCurrentUser() {
+    const response = await fetch(`${this.baseURL}/api/user/me`, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
+
+    return this.handleResponse(response);
+  }
+
+  /**
+   * Get dashboard KPIs
+   */
   async getDashboardKPIs() {
-    await this.mockDelay()
-    
-    return {
-      punctuality: parseFloat((95 + Math.random() * 5).toFixed(1)),
-      averageDelay: parseFloat((Math.random() * 10).toFixed(1)),
-      sectionThroughput: Math.floor(15 + Math.random() * 10),
-      trackUtilization: Math.floor(75 + Math.random() * 20)
-    }
+    const response = await fetch(`${this.baseURL}/api/dashboard/kpis`, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
+
+    return this.handleResponse(response);
   }
 
+  /**
+   * Get live trains for user's section
+   */
   async getTrains() {
-    await this.mockDelay()
-    
-    const statuses = ['On Time', 'Delayed', 'Conflict']
-    const trains = [
-      { id: '12004', name: 'Shatabdi Exp', location: 'Approaching GZB' },
-      { id: '12451', name: 'Shram Shakti', location: 'Aligarh Jn.' },
-      { id: '12002', name: 'Rajdhani Exp', location: 'Tundla Jn.' },
-      { id: '09876', name: 'Goods Train', location: 'Dadri' },
-      { id: '12312', name: 'Kalka Mail', location: 'Saharanpur' },
-      { id: '14554', name: 'Himachal Exp', location: 'Muzaffarnagar' }
-    ]
+    const response = await fetch(`${this.baseURL}/api/dashboard/trains`, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
 
-    return trains.map(train => ({
-      ...train,
-      status: statuses[Math.floor(Math.random() * statuses.length)],
-      recommendation: Math.random() > 0.7 ? 'View' : '-'
-    }))
+    return this.handleResponse(response);
   }
 
-  async getThroughputChart() {
-    await this.mockDelay()
-    
-    const hours = Array.from({length: 24}, (_, i) => 
-      String(i).padStart(2, '0') + ':00'
-    )
-    
-    const data = hours.map(() => Math.floor(8 + Math.random() * 20))
-    
-    return {
-      labels: hours,
-      data: data
-    }
+  /**
+   * Get section map data
+   */
+  async getSectionMap(sectionId) {
+    const response = await fetch(`${this.baseURL}/api/section_map/${sectionId}`, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
+
+    return this.handleResponse(response);
   }
 
-  async acceptRecommendation() {
-    await this.mockDelay()
-    
-    return {
-      success: true,
-      message: 'Recommendation executed successfully'
-    }
+  /**
+   * Get geographical section map for Leaflet
+   */
+  async getSectionMapGeo(sectionId) {
+    const response = await fetch(`${this.baseURL}/api/section_map/${sectionId}/geo`, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
+
+    return this.handleResponse(response);
   }
 
-  async runSimulation(scenario) {
-    await this.mockDelay(1000) // Longer delay for simulation
-    
-    return {
-      success: true,
-      results: {
-        originalDelay: 15,
-        optimizedDelay: 7,
-        impactedTrains: ['12451', '09876'],
-        recommendation: 'Halt Train 09876 for 7 minutes at Aligarh Junction'
-      }
-    }
-  }
-
+  /**
+   * Get audit trail logs
+   */
   async getAuditTrail() {
-    await this.mockDelay()
+    const response = await fetch(`${this.baseURL}/api/audit_trail`, {
+      method: 'GET',
+      headers: this.getAuthHeaders(),
+    });
+
+    return this.handleResponse(response);
+  }
+
+  /**
+   * Create WebSocket connection
+   */
+  createWebSocket(sectionId) {
+    const token = this.getToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+
+    // WebSocket URL with token as query parameter
+    const wsURL = `${this.baseURL.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/${sectionId}?token=${encodeURIComponent(token)}`;
     
-    const actions = [
-      'AI Recommendation Accepted',
-      'Manual Override Applied',
-      'Schedule Updated',
-      'Simulation Run'
-    ]
-    
-    return Array.from({length: 20}, (_, i) => ({
-      id: i + 1,
-      timestamp: new Date(Date.now() - i * 3600000).toISOString(),
-      action: actions[Math.floor(Math.random() * actions.length)],
-      user: 'SK001',
-      details: `Action performed on train ${12000 + Math.floor(Math.random() * 1000)}`
-    }))
+    return new WebSocket(wsURL);
+  }
+
+  /**
+   * Health check
+   */
+  async healthCheck() {
+    try {
+      const response = await fetch(`${this.baseURL}/health`, {
+        method: 'GET',
+      });
+
+      return this.handleResponse(response);
+    } catch (error) {
+      console.error('Health check failed:', error);
+      return { status: 'unhealthy', error: error.message };
+    }
   }
 }
 
-export const apiService = new ApiService()
+// Export singleton instance
+export const apiService = new ApiService();
+export default apiService;
