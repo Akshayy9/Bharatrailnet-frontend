@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 const AuthContext = createContext()
 
 // Get backend URL from environment variable
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = 'https://backend-v3iv.onrender.com'
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
