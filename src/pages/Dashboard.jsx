@@ -320,9 +320,52 @@ useEffect(() => {
   ];
   const getThemeIcon = () => (themeOptions.find(opt => opt.value === theme)?.icon || 'fas fa-sun');
 
-  const punctualityChartConfig = { type: 'bar', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Punctuality %', data: [98.1, 98.5, 97.2, 98.8, 99.1, 96.5, 97.9], backgroundColor: '#3b82f6' }] } };
-  const delayReasonsChartConfig = { type: 'pie', data: { labels: ['Signal Failure', 'Track Maintenance', 'Rolling Stock', 'Congestion', 'Other'], datasets: [{ data: [15, 25, 20, 30, 10], backgroundColor: ['#ef4444', '#f97316', '#eab308', '#8b5cf6', '#6b7280'] }] } };
-  const throughputChartConfig = { type: 'line', data: { labels: Array.from({ length: 12 }, (_, i) => `${(new Date().getHours() - 11 + i + 24) % 24}:00`), datasets: [{ label: 'Trains/Hour', data: [15, 18, 22, 19, 21, 25, 23, 18, 20, 22, 24, 21], fill: true, borderColor: '#3b82f6', tension: 0.4, backgroundColor: 'rgba(59, 130, 246, 0.1)' }]}};
+  const punctualityChartConfig = {
+  type: 'bar',
+  data: {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    datasets: [{
+      label: 'Punctuality %',
+      data: [98.1, 98.5, 97.2, 98.8, 99.1, 96.5, 97.9],
+      backgroundColor: '#3b82f6'
+    }]
+  },
+  options: {
+    animation: false
+  }
+};
+
+const delayReasonsChartConfig = {
+  type: 'pie',
+  data: {
+    labels: ['Signal Failure', 'Track Maintenance', 'Rolling Stock', 'Congestion', 'Other'],
+    datasets: [{
+      data: [15, 25, 20, 30, 10],
+      backgroundColor: ['#ef4444', '#f97316', '#eab308', '#8b5cf6', '#6b7280']
+    }]
+  },
+  options: {
+    animation: false
+  }
+};
+
+const throughputChartConfig = {
+  type: 'line',
+  data: {
+    labels: Array.from({ length: 12 }, (_, i) => `${(new Date().getHours() - 11 + i + 24) % 24}:00`),
+    datasets: [{
+      label: 'Trains/Hour',
+      data: [15, 18, 22, 19, 21, 25, 23, 18, 20, 22, 24, 21],
+      fill: true,
+      borderColor: '#3b82f6',
+      tension: 0.4,
+      backgroundColor: 'rgba(59, 130, 246, 0.1)'
+    }]
+  },
+  options: {
+    animation: false
+  }
+};
 
   return (
     <div className="flex h-screen overflow-hidden">
