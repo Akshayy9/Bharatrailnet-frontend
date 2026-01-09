@@ -527,62 +527,166 @@ const Dashboard = ({ onLogout }) => {
 
         {/* AI Modal */}
         {showAIModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-700 rounded-t-xl">
-                <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
-                  <i className="fas fa-brain text-blue-600 dark:text-blue-400 mr-3"></i> AI-Powered Conflict Resolution
-                </h3>
-                <button onClick={() => setShowAIModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl">&times;</button>
-              </div>
-              <div className="p-8">
-                <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-4 rounded-lg mb-6">
-                  <h4 className="font-bold text-red-800 dark:text-red-400 mb-2">🚨 CONFLICT: 12878 vs 22439</h4>
-                  <p className="text-sm text-red-700 dark:text-red-300">
-                    High-priority <b>12878 NDLS GZB SPL</b> (KM 18.7) vs <b>22439 DELHI RAJ SPL</b> (KM 18.7). 
-                    Without intervention: 18min delay to 12878.
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">🎯 Recommended Action</h5>
-                    <div className="p-4 border-2 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 rounded-lg">
-                      <p className="font-bold text-green-800 dark:text-green-400 text-lg mb-2">
-                        Hold <span className="text-red-600">22439 DELHI RAJ SPL</span> at <b>Sahibabad (SBD)</b> for <b>9 minutes</b>
-                      </p>
-                      <p className="text-sm text-green-700 dark:text-green-300">Priority: 12878 > 22439</p>
-                    </div>
-                  </div>
-                  <div>
-                    <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">📊 Projected Impact</h5>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
-                        <span><i className="fas fa-train text-green-500 mr-2"></i>12878 NDLS GZB SPL</span>
-                        <span className="font-bold text-green-600">✅ On Time</span>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-600">
+                {/* Header */}
+                <div className="px-8 pt-8 pb-6 border-b border-gray-200 dark:border-gray-600">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-4 shadow-lg">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
                       </div>
-                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
-                        <span><i className="fas fa-train text-yellow-500 mr-2"></i>22439 DELHI RAJ SPL</span>
-                        <span className="font-bold text-yellow-600">⏱️ +9m</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded border-t-2 border-blue-200 pt-2">
-                        <span><i className="fas fa-chart-line text-blue-500 mr-2"></i>Section Punctuality</span>
-                        <span className="font-bold text-blue-600">✅ Maintained</span>
+                      <div>
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">AI-Powered Conflict Resolution</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 font-medium">Automated decision support system</p>
                       </div>
                     </div>
+                    <button 
+                      onClick={() => setShowAIModal(false)} 
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
-              </div>
-              <div className="p-6 bg-gray-50 dark:bg-gray-700 rounded-b-xl flex justify-end space-x-4">
-                <button onClick={() => setShowAIModal(false)} className="py-2 px-6 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500">
-                  Override Manual
-                </button>
-                <button onClick={() => setShowAIModal(false)} className="py-2 px-8 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-bold flex items-center shadow-lg">
-                  <i className="fas fa-check mr-2"></i> Accept & Execute
-                </button>
+
+                {/* Content */}
+                <div className="p-8">
+                  {/* Conflict Alert */}
+                  <div className="bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/20 border border-red-200 dark:border-red-800 p-6 rounded-xl mb-8 shadow-sm">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-12 h-12 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center border-2 border-red-200 dark:border-red-700 mt-0.5">
+                        <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-2 leading-tight">
+                          Track Conflict Detected
+                        </h4>
+                        <p className="text-sm text-red-800 dark:text-red-200 leading-relaxed">
+                          <span className="font-mono font-semibold text-red-900 dark:text-red-50 px-1.5 py-0.5 bg-red-200 dark:bg-red-800/50 rounded">
+                            12878 NDLS GZB SPL
+                          </span>{' '}
+                          (KM 18.7, Priority 1) vs{' '}
+                          <span className="font-mono font-semibold text-red-900 dark:text-red-50 px-1.5 py-0.5 bg-red-200 dark:bg-red-800/50 rounded">
+                            22439 DELHI RAJ SPL
+                          </span>{' '}
+                          (KM 18.7). Projected 18-minute delay to high-priority train without intervention.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Recommendations */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Primary Recommendation */}
+                    <div>
+                      <h5 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide mb-4 flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                        Primary Recommendation
+                      </h5>
+                      <div className="p-6 border-2 border-green-200 dark:border-green-600 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/30 rounded-xl shadow-sm">
+                        <div className="font-mono text-2xl font-bold text-green-900 dark:text-green-100 mb-3 leading-tight">
+                          Hold 22439 DELHI RAJ SPL
+                        </div>
+                        <div className="space-y-3">
+                          <div className="flex items-center text-sm font-medium text-green-800 dark:text-green-200">
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            </svg>
+                            Location: Sahibabad Junction (SBD, KM 15.0)
+                          </div>
+                          <div className="flex items-center text-sm font-medium text-green-800 dark:text-green-200">
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Duration: 9 minutes (09:52 - 10:01 IST)
+                          </div>
+                          <div className="flex items-start pt-2 text-sm text-green-700 dark:text-green-300">
+                            <svg className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <span>Priority hierarchy maintained: 12878 (P1)  22439 (P2)</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Projected Impact */}
+                    <div>
+                      <h5 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide mb-4 flex items-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                        Projected Network Impact
+                      </h5>
+                      <div className="space-y-4">
+                        <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white flex items-center">
+                              <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                              12878 NDLS GZB SPL
+                            </span>
+                            <span className="font-semibold text-lg text-green-600 dark:text-green-400">On Schedule</span>
+                          </div>
+                        </div>
+                        <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white flex items-center">
+                              <svg className="w-4 h-4 text-yellow-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              22439 DELHI RAJ SPL
+                            </span>
+                            <span className="font-semibold text-lg text-yellow-600 dark:text-yellow-400">+9 min</span>
+                          </div>
+                        </div>
+                        <div className="p-5 pt-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-xl">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-semibold text-blue-900 dark:text-blue-100 flex items-center">
+                              <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                              </svg>
+                              GZB Section Punctuality
+                            </span>
+                            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">98.4%</span>
+                          </div>
+                          <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">Maintained above threshold</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="px-8 pb-8 pt-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-600 rounded-b-xl">
+                  <div className="flex justify-end space-x-3">
+                    <button 
+                      onClick={() => setShowAIModal(false)} 
+                      className="px-6 py-2.5 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-200 transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      Manual Override
+                    </button>
+                    <button 
+                      onClick={() => setShowAIModal(false)} 
+                      className="px-8 py-2.5 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg text-sm font-bold flex items-center shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Accept & Execute
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+
       </main>
     </div>
   );
