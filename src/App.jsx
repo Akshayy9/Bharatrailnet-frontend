@@ -11,9 +11,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
-      {!isAuthenticated ? (
-        <LoginPage onLogin={login} />
-      ) : (
+      {(
         <Dashboard onLogout={logout} />
       )}
       <Toast />

@@ -174,7 +174,7 @@ const LoginPage = ({ onLogin }) => {
             ) : (
               <>
                 <i className="fas fa-sign-in-alt mr-2"></i>
-                Sign In
+                Sign 
               </>
             )}
           </button>
